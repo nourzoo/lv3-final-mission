@@ -44,12 +44,12 @@ jobs:
         run: |
           set -euo pipefail
 
-          APP_DIR="${APP_DIR}"
+          APP_DIR="${APP_DIR:-/home/ubuntu/lv3-final-mission}"
           BRANCH="${BRANCH:-main}"
-          REPO_URL="${REPO_URL:-}"
+          REPO_URL="${REPO_URL:-https://github.com/nourzoo/lv3-final-mission.git}"
           INCLUDE_DB="${INCLUDE_DB:-false}"
-          ENV_FILE_INPUT="${ENV_FILE:-.env.prod}"
-
+          ENV_FILE_INPUT="${ENV_FILE:-.env}"
+          
           # 디렉터리 준비
           sudo mkdir -p "${APP_DIR}"
           sudo chown -R "$USER":"$USER" "${APP_DIR}"
@@ -69,6 +69,7 @@ jobs:
           git pull --ff-only origin "${BRANCH}"
 
           # 환경파일 확인
+          ENV_FILE_INPUT="${ENV_FILE:-.env}"
           if [ ! -f "${ENV_FILE_INPUT}" ]; then
             echo "${ENV_FILE_INPUT} not found on runner. Create it with prod secrets." >&2
             exit 1
