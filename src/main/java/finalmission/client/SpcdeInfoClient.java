@@ -16,12 +16,13 @@ public class SpcdeInfoClient {
 
     private static String serviceKey;
 
-    public SpcdeInfoClient(@Value("${spcde-info.service-key}") String serviceKey) {
+    public SpcdeInfoClient(@Value("${security.jwt.token.secret-key}") String serviceKey) {
         this.serviceKey = serviceKey;
     }
 
     public static SpcdeInfoResponseWrapper holidayInfoAPI(String year, String month) throws java.io.IOException {
-        StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo");
+        StringBuilder urlBuilder = new StringBuilder(
+                "http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo");
         urlBuilder.append("?" + URLEncoder.encode("ServiceKey", "UTF-8") + "=" + serviceKey);
         urlBuilder.append("&" + URLEncoder.encode("solYear", "UTF-8") + "=" + URLEncoder.encode(year, "UTF-8"));
         urlBuilder.append("&" + URLEncoder.encode("solMonth", "UTF-8") + "=" + URLEncoder.encode(month, "UTF-8"));

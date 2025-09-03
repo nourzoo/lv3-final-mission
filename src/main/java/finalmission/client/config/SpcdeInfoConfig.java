@@ -13,7 +13,7 @@ public class SpcdeInfoConfig {
 
     private final String serviceKey;
 
-    public SpcdeInfoConfig(@Value("${spcde-info.service-key}") String serviceKey) {
+    public SpcdeInfoConfig(@Value("${security.jwt.token.secret-key}") String serviceKey) {
         this.serviceKey = serviceKey;
     }
 
@@ -30,7 +30,8 @@ public class SpcdeInfoConfig {
 
     @Bean
     public RestClient tossRestClient(RestClient.Builder restClientBuilder) {
-        String encodedAuth = "Basic " + Base64.getEncoder().encodeToString((serviceKey + ":").getBytes(StandardCharsets.UTF_8));
+        String encodedAuth =
+                "Basic " + Base64.getEncoder().encodeToString((serviceKey + ":").getBytes(StandardCharsets.UTF_8));
 
         return restClientBuilder
                 .baseUrl("http://apis.data.go.kr/B090041/openapi/service")
