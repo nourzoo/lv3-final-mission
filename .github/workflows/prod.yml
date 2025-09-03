@@ -31,8 +31,7 @@ jobs:
 
   deploy:
     needs: build-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    runs-on: self-hosted
     env: # 필요한 값들을 정의(키는 Secret 유지)
       APP_DIR: /home/ubuntu/lv3-final-mission
       BRANCH: main
