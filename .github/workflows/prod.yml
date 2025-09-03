@@ -31,7 +31,7 @@ jobs:
 
   deploy:
     needs: build-test
-    runs-on: self-hosted
+    runs-on: [ self-hosted, real-prod ]
     env: # 필요한 값들을 정의(키는 Secret 유지)
       APP_DIR: /home/ubuntu/lv3-final-mission
       BRANCH: main
@@ -43,6 +43,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          set -x
+          PS4='+ $(date "+%H:%M:%S") '     # 각 명령 앞에 타임스탬프
+          
+          echo "[DBG] at $(date +%T)"; df -h; docker system df || true
 
           APP_DIR="${APP_DIR:-/home/ubuntu/lv3-final-mission}"
           BRANCH="${BRANCH:-main}"
