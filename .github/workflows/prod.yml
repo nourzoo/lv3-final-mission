@@ -35,7 +35,7 @@ jobs:
     env: # 필요한 값들을 정의(키는 Secret 유지)
       APP_DIR: /home/ubuntu/lv3-final-mission
       BRANCH: main
-      REPO_URL: https://github.com/nourzoo/lv2-final-mission.git
+      REPO_URL: https://github.com/nourzoo/lv3-final-mission.git
       INCLUDE_DB: "false"            # prod DB 분리 운영이면 false
       EC2_HOST: ec2-3-35-48-192.ap-northeast-2.compute.amazonaws.com
       EC2_USER: ubuntu
