@@ -77,8 +77,8 @@ jobs:
             git pull --ff-only origin "${BRANCH}"
 
             # prod 환경파일 확인
-            if [ ! -f ".env.prod" ]; then
-              echo ".env.prod not found on server. Create it with your prod secrets." >&2
+            if [ ! -f ".env" ]; then
+              echo ".env not found on server. Create it with your prod secrets." >&2
               exit 1
             fi
 
@@ -89,5 +89,5 @@ jobs:
             fi
 
             # 배포
-            docker compose ${COMPOSE_ARGS} --env-file .env.prod up -d --build
+            docker compose ${COMPOSE_ARGS} --env-file .env up -d --build
             docker image prune -f
