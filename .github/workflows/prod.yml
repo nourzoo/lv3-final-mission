@@ -37,57 +37,49 @@ jobs:
       BRANCH: main
       REPO_URL: https://github.com/nourzoo/lv3-final-mission.git
       INCLUDE_DB: "false"            # prod DB 분리 운영이면 false
-      EC2_HOST: ec2-3-35-48-192.ap-northeast-2.compute.amazonaws.com
-      EC2_USER: ubuntu
-      EC2_PORT: "22"
+      ENV_FILE: .env                 # 배포 시 사용할 env 파일
     steps:
-      - name: Deploy to EC2 via SSH and Docker Compose
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ec2-3-35-48-192.ap-northeast-2.compute.amazonaws.com   # EC2 퍼블릭 DNS
-          username: ubuntu                                             # 기본 계정
-          key: ${{ secrets.EC2_SSH_KEY }}                              # 키는 반드시 Secret
-          port: 22
-          script_stop: true
-          command_timeout: 30m
-          script: |
-            set -euo pipefail
+      - name: Deploy (local on self-hosted)
+        shell: bash
+        run: |
+          set -euo pipefail
 
-            APP_DIR="${APP_DIR}"
-            BRANCH="${BRANCH:-main}"
-            REPO_URL="${REPO_URL:-}"
-            INCLUDE_DB="${INCLUDE_DB:-false}"
+          APP_DIR="${APP_DIR}"
+          BRANCH="${BRANCH:-main}"
+          REPO_URL="${REPO_URL:-}"
+          INCLUDE_DB="${INCLUDE_DB:-false}"
+          ENV_FILE_INPUT="${ENV_FILE:-.env.prod}"
 
-            # 디렉터리 준비
-            sudo mkdir -p "${APP_DIR}"
-            sudo chown -R "$USER":"$USER" "${APP_DIR}"
+          # 디렉터리 준비
+          sudo mkdir -p "${APP_DIR}"
+          sudo chown -R "$USER":"$USER" "${APP_DIR}"
 
-            # 초기 clone (없을 때만)
-            if [ ! -d "${APP_DIR}/.git" ]; then
-              if [ -z "${REPO_URL}" ]; then
-                echo "REPO_URL is required for initial clone" >&2
-                exit 1
-              fi
-              git clone "${REPO_URL}" "${APP_DIR}"
-            fi
-
-            cd "${APP_DIR}"
-            git fetch --all --prune
-            git checkout "${BRANCH}"
-            git pull --ff-only origin "${BRANCH}"
-
-            # prod 환경파일 확인
-            if [ ! -f ".env" ]; then
-              echo ".env not found on server. Create it with your prod secrets." >&2
+          # 초기 clone (없을 때만)
+          if [ ! -d "${APP_DIR}/.git" ]; then
+            if [ -z "${REPO_URL}" ]; then
+              echo "REPO_URL is required for initial clone" >&2
               exit 1
             fi
+            git clone "${REPO_URL}" "${APP_DIR}"
+          fi
 
-            # Compose 파일 결정
-            COMPOSE_ARGS="-f docker-compose.yml"
-            if [ "${INCLUDE_DB}" = "true" ] && [ -f "docker-compose.db.yml" ]; then
-              COMPOSE_ARGS="${COMPOSE_ARGS} -f docker-compose.db.yml"
-            fi
+          cd "${APP_DIR}"
+          git fetch --all --prune
+          git checkout "${BRANCH}"
+          git pull --ff-only origin "${BRANCH}"
 
-            # 배포
-            docker compose ${COMPOSE_ARGS} --env-file .env up -d --build
-            docker image prune -f
+          # 환경파일 확인
+          if [ ! -f "${ENV_FILE_INPUT}" ]; then
+            echo "${ENV_FILE_INPUT} not found on runner. Create it with prod secrets." >&2
+            exit 1
+          fi
+
+          # Compose 파일 결정
+          COMPOSE_ARGS="-f docker-compose.yml"
+          if [ "${INCLUDE_DB}" = "true" ] && [ -f "docker-compose.db.yml" ]; then
+            COMPOSE_ARGS="${COMPOSE_ARGS} -f docker-compose.db.yml"
+          fi
+
+          # 배포
+          docker compose ${COMPOSE_ARGS} --env-file "${ENV_FILE_INPUT}" up -d --build
+          docker image prune -f
