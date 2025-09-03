@@ -16,7 +16,7 @@ public class SpcdeInfoClient {
 
     private static String serviceKey;
 
-    public SpcdeInfoClient(@Value("${security.jwt.token.secret-key}") String serviceKey) {
+    public SpcdeInfoClient(@Value("${spcde-info.service-key}") String serviceKey) {
         this.serviceKey = serviceKey;
     }
 

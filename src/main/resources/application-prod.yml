@@ -21,3 +21,6 @@ security:
   jwt:
     token:
       secret-key: ${JWT_SECRET}
+
+spcde-info:
+  service-key: ${SPCDE_INFO_SERVICE_KEY}

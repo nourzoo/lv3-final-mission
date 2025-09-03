@@ -13,7 +13,7 @@ public class SpcdeInfoConfig {
 
     private final String serviceKey;
 
-    public SpcdeInfoConfig(@Value("${security.jwt.token.secret-key}") String serviceKey) {
+    public SpcdeInfoConfig(@Value("${spcde-info.service-key}") String serviceKey) {
         this.serviceKey = serviceKey;
     }
 

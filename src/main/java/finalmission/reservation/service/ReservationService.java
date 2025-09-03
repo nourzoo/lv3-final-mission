@@ -73,6 +73,16 @@ public class ReservationService {
     private void validateHoliday(SpcdeInfoResponseWrapper response, int targetDate) {
         boolean isHoliday = false;
 
+        if (response == null
+                || response.response() == null
+                || response.response().body() == null
+                || response.response().body().items() == null
+                || response.response().body().items().item() == null) {
+            // 응답이 비정상인 경우 공휴일 정보를 판별할 수 없으므로 넘어갑니다.
+            // (실제 운영에서는 명시적 예외 처리나 재시도 전략 고려)
+            return;
+        }
+
         List<Item> items = response.response()
                 .body()
                 .items()
@@ -80,7 +90,7 @@ public class ReservationService {
 
         if (!items.isEmpty()) {
             for (Item item : items) {
-                if (item.locdate().equals(targetDate)) {
+                if (item.locdate() != null && item.locdate().equals(targetDate)) {
                     isHoliday = true;
                 }
             }
